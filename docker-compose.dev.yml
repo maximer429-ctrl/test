@@ -1,0 +1,16 @@
+services:
+  angular-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: angular-dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app/frontend
+    working_dir: /app/frontend
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+    command: ng serve --host 0.0.0.0 --port 4200 --poll=2000
