@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { tap, catchError, delay } from 'rxjs/operators';
+import { MockUserDatabaseService } from './mock-user-database.service';
 
 export interface AuthResponse {
   success: boolean;
@@ -33,6 +34,7 @@ export class AuthService {
   public currentUser$ = this.currentUser.asObservable();
 
   private http = inject(HttpClient);
+  private mockUserDb = inject(MockUserDatabaseService);
 
   constructor() {
     // Restore session on service initialization
@@ -95,9 +97,16 @@ export class AuthService {
     // Mock delay to simulate API call
     return new Observable(observer => {
       setTimeout(() => {
-        if (username && password && password.length >= 6) {
+        // Validate against mock database
+        const validation = this.mockUserDb.validateCredentials(username, password);
+
+        if (validation.success && validation.user) {
           const token = 'mock-token-' + Date.now();
-          const user: User = { username, email: `${username}@example.com`, token };
+          const user: User = {
+            username: validation.user.username,
+            email: validation.user.email,
+            token
+          };
 
           localStorage.setItem(this.TOKEN_KEY, token);
           localStorage.setItem(this.USER_KEY, JSON.stringify(user));
@@ -123,7 +132,10 @@ export class AuthService {
   register(username: string, email: string, password: string): Observable<AuthResponse> {
     return new Observable(observer => {
       setTimeout(() => {
-        if (username && email && password && password.length >= 6) {
+        // Use mock database to register user
+        const result = this.mockUserDb.registerUser(username, email, password);
+
+        if (result.success) {
           const token = 'mock-token-' + Date.now();
           const user: User = { username, email, token };
 
@@ -137,7 +149,7 @@ export class AuthService {
           observer.complete();
         } else {
           observer.error({
-            error: 'Registration failed. Please check your input.'
+            error: result.error || 'Registration failed'
           });
         }
       }, 1000);
