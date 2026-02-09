@@ -60,7 +60,18 @@ export class PasswordRecoveryComponent {
       },
       error: (err: any) => {
         this.loading = false;
-        this.error = err.error || 'Password recovery request failed. Please try again.';
+        // err could be { error: 'message' } or just an error object
+        if (typeof err === 'object' && err.error) {
+          this.error = err.error;
+        } else if (typeof err === 'string') {
+          this.error = err;
+        } else {
+          this.error = 'Password recovery request failed. Please try again.';
+        }
+      },
+      complete: () => {
+        // Ensure loading is always cleared
+        this.loading = false;
       }
     });
   }

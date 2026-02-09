@@ -53,7 +53,18 @@ export class LoginComponent {
       },
       error: (err: any) => {
         this.loading = false;
-        this.error = err.error || 'Login failed. Please try again.';
+        // err could be { error: 'message' } or just an error object
+        if (typeof err === 'object' && err.error) {
+          this.error = err.error;
+        } else if (typeof err === 'string') {
+          this.error = err;
+        } else {
+          this.error = 'Login failed. Please try again.';
+        }
+      },
+      complete: () => {
+        // Ensure loading is always cleared
+        this.loading = false;
       }
     });
   }
