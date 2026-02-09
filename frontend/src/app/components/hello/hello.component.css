@@ -1,0 +1,134 @@
+.hello-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: flex-end;
+  backdrop-filter: blur(10px);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: white;
+}
+
+.greeting {
+  font-size: 1rem;
+}
+
+.greeting strong {
+  font-weight: 600;
+}
+
+.logout-btn {
+  padding: 0.5rem 1.5rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
+.logout-btn:active {
+  background: #b91c1c;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.greeting-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.hello-text {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.05em;
+}
+
+.message {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+.user-details {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  font-size: 0.95rem;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.detail-item span {
+  color: #667eea;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .hello-text {
+    font-size: 2.5rem;
+  }
+
+  .greeting-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .user-info {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}

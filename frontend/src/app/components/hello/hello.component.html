@@ -1,0 +1,26 @@
+<div class="hello-container">
+  <div class="header">
+    <div class="user-info" *ngIf="currentUser">
+      <span class="greeting">Welcome, <strong>{{ currentUser.username }}</strong>!</span>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="greeting-card">
+      <h1 class="hello-text">Hello World</h1>
+      <p class="message">You have successfully logged in to your account.</p>
+      
+      <div class="user-details" *ngIf="currentUser">
+        <div class="detail-item">
+          <label>Username:</label>
+          <span>{{ currentUser.username }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Email:</label>
+          <span>{{ currentUser.email }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
