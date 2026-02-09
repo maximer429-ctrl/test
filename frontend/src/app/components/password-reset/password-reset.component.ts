@@ -128,3 +128,11 @@ export class PasswordResetComponent implements OnInit {
       complete: () => {
         // Ensure loading is always cleared
         this.loading = false;
+      }
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/login']);
+  }
+}
