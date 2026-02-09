@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -45,13 +45,13 @@ export class LoginComponent {
     const { username, password } = this.loginForm.value;
 
     this.authService.login(username, password).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.loading = false;
         if (response.success) {
           this.router.navigate(['/hello']);
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.error = err.error || 'Login failed. Please try again.';
       }
