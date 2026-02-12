@@ -16,6 +16,7 @@ export class LoginComponent {
   loading = false;
   submitted = false;
   error: string | null = null;
+  rawError: any = null;
 
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
@@ -53,18 +54,18 @@ export class LoginComponent {
       },
       error: (err: any) => {
         this.loading = false;
-        // err could be { error: 'message' } or just an error object
-        if (typeof err === 'object' && err.error) {
+        this.rawError = err;
+        // Handle Error objects or custom error objects
+        if (err instanceof Error) {
+          this.error = err.message;
+        } else if (typeof err === 'object' && err.error) {
           this.error = err.error;
         } else if (typeof err === 'string') {
           this.error = err;
         } else {
           this.error = 'Login failed. Please try again.';
         }
-      },
-      complete: () => {
-        // Ensure loading is always cleared
-        this.loading = false;
+        console.error('Login error:', err);
       }
     });
   }
