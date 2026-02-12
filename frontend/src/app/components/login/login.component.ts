@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -44,16 +45,21 @@ export class LoginComponent {
     this.loading = true;
 
     const { username, password } = this.loginForm.value;
+    console.debug('Attempting login for', username);
 
-    this.authService.login(username, password).subscribe({
-      next: (response: any) => {
+    this.authService.login(username, password).pipe(
+      finalize(() => {
+        // Always clear loading state
         this.loading = false;
+      })
+    ).subscribe({
+      next: (response: any) => {
+        console.debug('Login response:', response);
         if (response.success) {
           this.router.navigate(['/hello']);
         }
       },
       error: (err: any) => {
-        this.loading = false;
         this.rawError = err;
         // Handle Error objects or custom error objects
         if (err instanceof Error) {
