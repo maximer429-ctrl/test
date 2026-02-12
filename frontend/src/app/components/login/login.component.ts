@@ -60,18 +60,23 @@ export class LoginComponent {
         }
       },
       error: (err: any) => {
-        this.rawError = err;
-        // Handle Error objects or custom error objects
+        // Normalize raw error to a plain object for display
         if (err instanceof Error) {
+          this.rawError = { name: err.name, message: err.message, stack: err.stack };
           this.error = err.message;
         } else if (typeof err === 'object' && err.error) {
+          this.rawError = err;
           this.error = err.error;
         } else if (typeof err === 'string') {
+          this.rawError = { message: err };
           this.error = err;
         } else {
+          this.rawError = { original: err };
           this.error = 'Login failed. Please try again.';
         }
-        console.error('Login error:', err);
+
+        console.error('Login error (normalized):', this.rawError);
+        console.debug('Displayed error:', this.error);
       }
     });
   }

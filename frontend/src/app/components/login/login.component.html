@@ -6,7 +6,10 @@
     <div *ngIf="error" class="alert alert-error">
       {{ error }}
     </div>
-    <pre *ngIf="rawError" class="debug-error">{{ rawError | json }}</pre>
+    <div *ngIf="rawError" class="debug-block">
+      <pre *ngIf="rawError.message" class="debug-error">Error details: {{ rawError.message }}</pre>
+      <pre *ngIf="!rawError.message" class="debug-error">{{ rawError | json }}</pre>
+    </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
