@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError, delay } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, of, timer } from 'rxjs';
+import { tap, catchError, delay, switchMap } from 'rxjs/operators';
 import { MockUserDatabaseService } from './mock-user-database.service';
 
 export interface AuthResponse {
@@ -94,35 +94,28 @@ export class AuthService {
    * TODO: Replace with actual API call when backend is ready
    */
   login(username: string, password: string): Observable<AuthResponse> {
-    // Mock delay to simulate API call
-    return new Observable(observer => {
-      setTimeout(() => {
-        // Validate against mock database
-        const validation = this.mockUserDb.validateCredentials(username, password);
+    // Validate against mock database synchronously
+    const validation = this.mockUserDb.validateCredentials(username, password);
 
-        if (validation.success && validation.user) {
-          const token = 'mock-token-' + Date.now();
-          const user: User = {
-            username: validation.user.username,
-            email: validation.user.email,
-            token
-          };
+    if (validation.success && validation.user) {
+      const token = 'mock-token-' + Date.now();
+      const user: User = {
+        username: validation.user.username,
+        email: validation.user.email,
+        token
+      };
 
-          localStorage.setItem(this.TOKEN_KEY, token);
-          localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      // Persist session synchronously, then emit response after a short delay
+      localStorage.setItem(this.TOKEN_KEY, token);
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      this.currentUser.next(user);
+      this.authState.next(true);
 
-          this.currentUser.next(user);
-          this.authState.next(true);
+      return of({ success: true, token, username }).pipe(delay(1000));
+    }
 
-          observer.next({ success: true, token, username });
-          observer.complete();
-        } else {
-          observer.error({
-            error: 'Invalid username or password'
-          });
-        }
-      }, 1000);
-    });
+    // Emit error after delay so subscribers see it consistently
+    return timer(1000).pipe(switchMap(() => throwError(() => new Error('Invalid username or password'))));
   }
 
   /**
@@ -130,30 +123,22 @@ export class AuthService {
    * TODO: Replace with actual API call when backend is ready
    */
   register(username: string, email: string, password: string): Observable<AuthResponse> {
-    return new Observable(observer => {
-      setTimeout(() => {
-        // Use mock database to register user
-        const result = this.mockUserDb.registerUser(username, email, password);
+    const result = this.mockUserDb.registerUser(username, email, password);
 
-        if (result.success) {
-          const token = 'mock-token-' + Date.now();
-          const user: User = { username, email, token };
+    if (result.success) {
+      const token = 'mock-token-' + Date.now();
+      const user: User = { username, email, token };
 
-          localStorage.setItem(this.TOKEN_KEY, token);
-          localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      localStorage.setItem(this.TOKEN_KEY, token);
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
 
-          this.currentUser.next(user);
-          this.authState.next(true);
+      this.currentUser.next(user);
+      this.authState.next(true);
 
-          observer.next({ success: true, token, username, email });
-          observer.complete();
-        } else {
-          observer.error({
-            error: result.error || 'Registration failed'
-          });
-        }
-      }, 1000);
-    });
+      return of({ success: true, token, username, email }).pipe(delay(1000));
+    }
+
+    return timer(1000).pipe(switchMap(() => throwError(() => new Error(result.error || 'Registration failed'))));
   }
 
   /**
@@ -171,21 +156,11 @@ export class AuthService {
    * TODO: Replace with actual API call when backend is ready
    */
   requestPasswordRecovery(usernameOrEmail: string): Observable<AuthResponse> {
-    return new Observable(observer => {
-      setTimeout(() => {
-        if (usernameOrEmail) {
-          observer.next({
-            success: true,
-            message: 'Password recovery email sent. Please check your inbox.'
-          });
-          observer.complete();
-        } else {
-          observer.error({
-            error: 'Invalid username or email'
-          });
-        }
-      }, 1000);
-    });
+    if (usernameOrEmail) {
+      return of({ success: true, message: 'Password recovery email sent. Please check your inbox.' }).pipe(delay(1000));
+    }
+
+    return timer(1000).pipe(switchMap(() => throwError(() => new Error('Invalid username or email'))));
   }
 
   /**
@@ -193,21 +168,11 @@ export class AuthService {
    * TODO: Replace with actual API call when backend is ready
    */
   resetPassword(token: string, newPassword: string): Observable<AuthResponse> {
-    return new Observable(observer => {
-      setTimeout(() => {
-        if (token && newPassword && newPassword.length >= 6) {
-          observer.next({
-            success: true,
-            message: 'Password reset successfully. Please login with your new password.'
-          });
-          observer.complete();
-        } else {
-          observer.error({
-            error: 'Invalid token or password'
-          });
-        }
-      }, 1000);
-    });
+    if (token && newPassword && newPassword.length >= 6) {
+      return of({ success: true, message: 'Password reset successfully. Please login with your new password.' }).pipe(delay(1000));
+    }
+
+    return timer(1000).pipe(switchMap(() => throwError(() => new Error('Invalid token or password'))));
   }
 
   /**
